@@ -1,0 +1,12 @@
+.noerror{
+    width: 100%;
+    background-color: rgb(89, 184, 89);
+    border:solid black;
+    padding: 70px;
+    text-align: center;
+}
+.error{
+    width: 100%;
+    background-color: red;
+    border:solid black;
+}

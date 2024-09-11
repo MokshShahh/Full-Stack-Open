@@ -1,6 +1,7 @@
 import { useState,useEffect } from 'react'
 import axios from "axios"
 import phonebookServices from './services/phonebook'
+import Error from './error'
 
 const Filter = ({ filterfunc }) => {
   return (
@@ -43,6 +44,9 @@ const App = () => {
   const [namesToShow, setNamesToShow] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const[currentName,setcurrentName] = useState('')
+  const[errorStatus,seterrorStatus] = useState()
+  
 
   useEffect(()=>{
     phonebookServices
@@ -66,6 +70,7 @@ const App = () => {
             person.id === persons[i].id ? { ...person, number: newNumber } : person
           );
           setPersons(updatedPersons);
+          
           setNamesToShow(updatedPersons);
           setNewName("");
           setNewNumber("");})
@@ -82,6 +87,11 @@ const App = () => {
       setNewName("")
       setNewNumber("")
     })
+    setcurrentName(newName)
+    seterrorStatus(true)
+    setTimeout(() => {
+      setcurrentName(null);
+    }, 5000);
     
   }
 
@@ -107,12 +117,8 @@ const App = () => {
           setNamesToShow(updatedPersons);
         })
         .catch(error => {
-          console.error("Error deleting person:", error);
-          if (error.response && error.response.status === 404) {
-            alert("This person was already removed from the server.");
-          } else {
-            alert("An error occurred while deleting the person.");
-          }
+          seterrorStatus(false)
+          
         });
     }
   }
@@ -122,6 +128,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Error name={currentName} errorStatus={errorStatus}/>
 
       <Filter filterfunc={filterfunc} />
 
