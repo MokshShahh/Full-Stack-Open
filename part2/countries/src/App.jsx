@@ -5,6 +5,10 @@ import axios from "axios";
 const App =()=>{
   const [countries,setcountries]=useState([])
   const [searchItem,setsearchItem]=useState('')
+  const [weather,setweather]=useState(null)
+  
+
+
   useEffect(()=>{
     if(searchItem.trim()===''){
       setcountries([])
@@ -18,6 +22,10 @@ const App =()=>{
         .then(Response =>{
           
           setcountries(Response.data)
+          if(Response.data.length===1){
+            const capital=Response.data[0].capital
+            fetchWeather(capital)
+          }
         })
 
       }
@@ -27,6 +35,23 @@ const App =()=>{
       }
     
   },[searchItem])
+
+  const fetchWeather=(capital)=>{
+    try {
+      const apiKey=import.meta.env.VITE_SOME_KEY
+      axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${apiKey}&units=metric`)
+                                .then(response=>{
+                                  setweather(response.data)
+                                  
+                                  console.log(response.data)
+                                })
+      
+    } catch (error) {
+      console.log("error in fething weather data")
+      setweather(null)
+      
+    }
+  }
 
   const renderLanguages=(language)=>{
     if(Array.isArray(language)){
@@ -55,7 +80,14 @@ const App =()=>{
       <ul>
         
         {countries.map(country=>(
-      <li key={country.name.common}>{country.name.common}</li>)
+      <li key={country.name.common}>{country.name.common} 
+      <button onClick={()=>{
+        setsearchItem(country.name.common)
+        
+        setcountries([country])
+        
+
+      }}>SHOW</button></li>)
     
     )
 
@@ -78,6 +110,12 @@ const App =()=>{
         
       </div><br/>
       <img alt="country flag" src={countries[0].flags.png}/>
+      <h3>CURRENT WEATHER at {countries[0].capital} </h3>
+      <img src={`http://openweathermap.org/img/wn/${weather.weather[0].icon}.png`} alt="weather icon"></img>
+      <p>TEMP: {weather.main.temp} C</p>
+      <p>HUMIDITY {weather.main.humidity} </p>
+      <p>WIND SPEED {weather.wind.speed} </p>
+      
         
     </div>
   )}
